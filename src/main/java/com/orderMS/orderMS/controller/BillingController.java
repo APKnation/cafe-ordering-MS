@@ -16,8 +16,11 @@ public class BillingController {
     private final BillingService billingService;
 
     @PostMapping("/generate/{orderId}")
-    public ResponseEntity<Bill> generateBill(@PathVariable Long orderId) {
-        return ResponseEntity.ok(billingService.generateBill(orderId));
+    public ResponseEntity<Bill> generateBill(
+            @PathVariable Long orderId,
+            @RequestParam(required = false) java.math.BigDecimal discount,
+            @RequestParam(required = false) Boolean isPercentage) {
+        return ResponseEntity.ok(billingService.generateBill(orderId, discount, isPercentage));
     }
 
     @PostMapping("/{billId}/pay")
@@ -25,5 +28,10 @@ public class BillingController {
             @PathVariable Long billId,
             @RequestParam PaymentMethod method) {
         return ResponseEntity.ok(billingService.payBill(billId, method));
+    }
+
+    @GetMapping("/{billId}/receipt")
+    public ResponseEntity<String> getReceipt(@PathVariable Long billId) {
+        return ResponseEntity.ok(billingService.getReceiptText(billId));
     }
 }
