@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coffee, ArrowRight, Star, Clock, MapPin, Phone, Instagram, Facebook, Twitter, ChefHat, CupSoda, CakeSlice } from 'lucide-react';
+import { Coffee, ArrowRight, Star, Clock, MapPin, Phone, Globe, Mail, Heart, ChefHat, CupSoda, CakeSlice } from 'lucide-react';
 
 export default function LandingPage({ onStaffLogin }) {
   const [scrolled, setScrolled] = useState(false);
@@ -205,13 +205,13 @@ export default function LandingPage({ onStaffLogin }) {
           
           <div className="flex items-center gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-              <Instagram size={18} />
+              <Globe size={18} />
             </a>
             <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-              <Twitter size={18} />
+              <Mail size={18} />
             </a>
             <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-              <Facebook size={18} />
+              <Heart size={18} />
             </a>
           </div>
         </div>
