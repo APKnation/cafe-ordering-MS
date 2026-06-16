@@ -44,4 +44,11 @@ public class MenuService {
             return menuItemRepository.save(item);
         }).orElseThrow(() -> new RuntimeException("MenuItem not found"));
     }
+
+    public void deleteMenuItem(Long id) {
+        if (!menuItemRepository.existsById(id)) {
+            throw new RuntimeException("MenuItem not found");
+        }
+        menuItemRepository.deleteById(id);
+    }
 }
