@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Coffee, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Coffee, Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
 import { login } from '../api';
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, onBack }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
@@ -41,6 +41,16 @@ export default function LoginPage({ onLogin }) {
       </div>
 
       <div className="relative z-10 w-full max-w-md px-6">
+        {onBack && (
+          <button 
+            onClick={onBack}
+            className="absolute top-0 left-6 flex items-center gap-2 text-slate-400 hover:text-white transition-smooth bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10"
+          >
+            <ArrowLeft size={16} />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        )}
+        
         {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-2xl"
