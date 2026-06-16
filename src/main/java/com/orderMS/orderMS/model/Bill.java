@@ -28,6 +28,7 @@ public class Bill {
 
     private BigDecimal totalAmount;
     private BigDecimal taxAmount;
+    private BigDecimal discountAmount;
     private BigDecimal finalAmount;
 
     @Enumerated(EnumType.STRING)
