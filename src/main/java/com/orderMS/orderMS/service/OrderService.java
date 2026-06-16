@@ -74,7 +74,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         order.setStatus(newStatus);
-        if (newStatus == OrderStatus.COMPLETED) {
+        if (newStatus == OrderStatus.SERVED) {
             order.setCompletedAt(LocalDateTime.now());
         }
 
