@@ -52,7 +52,7 @@ export default function MenuView({ isAdmin }) {
   const [editItem, setEditItem] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', description: '', price: '', category: 'FOOD', available: true });
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: 'FOOD', isAvailable: true });
 
   const load = () => {
     setLoading(true);
@@ -66,13 +66,13 @@ export default function MenuView({ isAdmin }) {
 
   const openAdd = () => {
     setEditItem(null);
-    setForm({ name: '', description: '', price: '', category: 'FOOD', available: true });
+    setForm({ name: '', description: '', price: '', category: 'FOOD', isAvailable: true });
     setShowModal(true);
   };
 
   const openEdit = (item) => {
     setEditItem(item);
-    setForm({ name: item.name, description: item.description || '', price: item.price, category: item.category, available: item.available });
+    setForm({ name: item.name, description: item.description || '', price: item.price, category: item.category, isAvailable: item.isAvailable !== false });
     setShowModal(true);
   };
 
@@ -100,7 +100,7 @@ export default function MenuView({ isAdmin }) {
     i.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const available = items.filter(i => i.available).length;
+  const available = items.filter(i => i.isAvailable !== false).length;
 
   return (
     <div className="space-y-6">
@@ -165,7 +165,7 @@ export default function MenuView({ isAdmin }) {
                   {item.category}
                 </span>
                 <div className="flex items-center gap-1">
-                  {item.available
+                  {item.isAvailable !== false
                     ? <ToggleRight size={22} className="text-emerald-400" />
                     : <ToggleLeft size={22} className="text-slate-500" />}
                 </div>
@@ -213,10 +213,10 @@ export default function MenuView({ isAdmin }) {
               </select>
             </div>
             <label className="flex items-center gap-3 cursor-pointer">
-              <div onClick={() => setForm(f => ({ ...f, available: !f.available }))}
+              <div onClick={() => setForm(f => ({ ...f, isAvailable: !f.isAvailable }))}
                 className="relative w-11 h-6 rounded-full transition-smooth cursor-pointer"
-                style={{ background: form.available ? '#10b981' : '#374151' }}>
-                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.available ? 'left-5' : 'left-0.5'}`} />
+                style={{ background: form.isAvailable ? '#10b981' : '#374151' }}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.isAvailable ? 'left-5' : 'left-0.5'}`} />
               </div>
               <span className="text-sm text-slate-300">Available</span>
             </label>

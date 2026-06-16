@@ -22,7 +22,7 @@ export default function LandingPage({ onStaffLogin }) {
           getTables().catch(() => [])
         ]);
         setMenuItems(menuRes.slice(0, 6)); // Show top 6
-        setAvailableTables(tablesRes.filter(t => t.status === 'AVAILABLE').length);
+        setAvailableTables(tablesRes.filter(t => t.isOccupied === false).length);
       } catch (err) {
         console.error('Error fetching public data:', err);
       } finally {
@@ -48,9 +48,12 @@ export default function LandingPage({ onStaffLogin }) {
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+            <a href="#home" className="hover:text-white transition-colors">Home</a>
             <a href="#menu" className="hover:text-white transition-colors">Menu</a>
+            <a href="#table" className="hover:text-white transition-colors">Table</a>
+            <a href="#services" className="hover:text-white transition-colors">Services</a>
             <a href="#about" className="hover:text-white transition-colors">About Us</a>
-            <a href="#location" className="hover:text-white transition-colors">Location</a>
+            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
           </div>
 
           <button 
@@ -64,7 +67,7 @@ export default function LandingPage({ onStaffLogin }) {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+      <section id="home" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
         {/* Background Effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] opacity-20 pointer-events-none">
           <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-emerald-500 blur-[100px] animate-pulse" />
@@ -104,8 +107,34 @@ export default function LandingPage({ onStaffLogin }) {
         </div>
       </section>
 
-      {/* Featured Categories */}
-      <section id="menu" className="py-24 relative">
+      {/* Services Section */}
+      <section id="services" className="py-24 bg-[#0a0f1e] relative border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
+            <p className="text-slate-400 max-w-xl mx-auto">More than just great coffee. Discover everything we have to offer.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Coffee, title: "Dine-In Experience", desc: "Enjoy our cozy, aesthetic ambiance perfect for work or relaxation." },
+              { icon: MapPin, title: "Fast Takeaway", desc: "On the go? Grab your favorite brew and pastries without the wait." },
+              { icon: Star, title: "Event Catering", desc: "Elevate your private events with our premium coffee and catering." },
+              { icon: Globe, title: "Free Wi-Fi", desc: "Your perfect remote workspace with reliable internet and great coffee." }
+            ].map((srv, i) => (
+              <div key={i} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-400">
+                  <srv.icon size={24} />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-white">{srv.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{srv.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Categories (Menu) */}
+      <section id="menu" className="py-24 relative bg-white/[0.02]">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Specialties</h2>
@@ -128,7 +157,7 @@ export default function LandingPage({ onStaffLogin }) {
               ))
             ) : menuItems.length > 0 ? (
               menuItems.map((item) => (
-                <div key={item.id} className="group rounded-3xl bg-white/[0.02] border border-white/5 p-6 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 flex flex-col h-full">
+                <div key={item.id} className="group rounded-3xl bg-[#0a0f1e] border border-white/5 p-6 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 flex flex-col h-full shadow-xl">
                   <div className="flex justify-between items-start mb-4">
                     <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                       {item.category === 'Drinks' ? <CupSoda className="text-indigo-400" size={24} /> :
@@ -160,8 +189,96 @@ export default function LandingPage({ onStaffLogin }) {
         </div>
       </section>
 
+      {/* Table Section */}
+      <section id="table" className="py-24 bg-[#0a0f1e] relative">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border border-indigo-500/20 rounded-[2.5rem] p-8 md:p-16 relative overflow-hidden">
+             {/* Background glow */}
+             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-indigo-500/20 blur-[100px] rounded-full"></div>
+             
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+                <div>
+                   <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">Secure your perfect spot.</h2>
+                   <p className="text-indigo-200 mb-8 text-lg">Whether it's a romantic date, a business meeting, or just some quiet time to read, book a table in advance to ensure the best experience.</p>
+                   
+                   <div className="flex items-center gap-4 bg-[#0a0f1e]/50 border border-white/10 p-4 rounded-2xl w-max mb-8 backdrop-blur-sm">
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-400">
+                         <Star size={24} />
+                      </div>
+                      <div>
+                         <p className="text-sm text-slate-400">Current Availability</p>
+                         <p className="font-bold text-white text-lg">
+                           {!loadingData ? `${availableTables} Tables Ready` : 'Checking...'}
+                         </p>
+                      </div>
+                   </div>
+
+                   <button className="px-8 py-4 rounded-full bg-white text-[#0a0f1e] font-bold hover:bg-slate-200 transition-colors shadow-xl">
+                      Reserve a Table Now
+                   </button>
+                </div>
+                
+                <div className="relative hidden md:block">
+                   <div className="aspect-video bg-white/5 rounded-3xl border border-white/10 p-6 flex items-center justify-center backdrop-blur-md">
+                      <div className="grid grid-cols-3 gap-6 w-full">
+                         {/* Visual mock tables */}
+                         {[...Array(6)].map((_, i) => (
+                            <div key={i} className={`aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${i < (loadingData ? 0 : availableTables) ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50'}`}>
+                               <div className={`w-8 h-8 rounded-full ${i < (loadingData ? 0 : availableTables) ? 'bg-emerald-400/50 shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'bg-slate-600/50'}`}></div>
+                               <span className={`text-xs font-bold ${i < (loadingData ? 0 : availableTables) ? 'text-emerald-400' : 'text-slate-500'}`}>T-{i+1}</span>
+                            </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section id="about" className="py-24 bg-white/[0.02] border-t border-white/5 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="order-2 md:order-1 relative">
+             <div className="aspect-[4/5] rounded-3xl bg-gradient-to-tr from-indigo-500/20 to-blue-500/20 border border-white/10 p-2 shadow-2xl overflow-hidden relative">
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80')] bg-cover bg-center mix-blend-overlay opacity-80"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1e] via-transparent to-transparent"></div>
+              <div className="absolute bottom-8 left-8 right-8">
+                <div className="glass rounded-xl p-4 flex items-center gap-4 backdrop-blur-md border border-white/10 bg-[#0a0f1e]/80">
+                  <Coffee className="text-white" size={24} />
+                  <div>
+                    <p className="text-sm font-semibold text-white">Quality First</p>
+                    <p className="text-xs text-slate-300">Handcrafted with precision</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="order-1 md:order-2">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Our Story</h2>
+            <p className="text-indigo-300 font-medium mb-6 leading-relaxed text-lg">
+              Founded with a simple mission: to bring ethically sourced, masterfully roasted coffee to our community. 
+            </p>
+            <p className="text-slate-400 mb-8 leading-relaxed">
+              We believe that a cafe is more than just a place to get a drink. It's a sanctuary, a meeting ground, and a space for inspiration. Every bean we brew and every pastry we bake is crafted with passion, precision, and a deep respect for the art of hospitality.
+            </p>
+            <div className="flex items-center gap-8">
+               <div className="flex flex-col">
+                  <span className="text-4xl font-extrabold text-white mb-1">10+</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Coffee Blends</span>
+               </div>
+               <div className="w-px h-12 bg-white/10"></div>
+               <div className="flex flex-col">
+                  <span className="text-4xl font-extrabold text-white mb-1">100%</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Organic Beans</span>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Info Section */}
-      <section id="location" className="py-24 bg-white/[0.02] border-y border-white/5 relative overflow-hidden">
+      <section id="contact" className="py-24 bg-white/[0.02] border-y border-white/5 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Come visit us</h2>
