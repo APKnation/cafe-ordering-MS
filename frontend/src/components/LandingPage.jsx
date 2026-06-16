@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Coffee, ArrowRight, Star, Clock, MapPin, Phone, Globe, Mail, Heart, ChefHat, CupSoda, CakeSlice } from 'lucide-react';
+import { getAvailableMenuItems, getTables } from '../api';
 
 export default function LandingPage({ onStaffLogin }) {
   const [scrolled, setScrolled] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [availableTables, setAvailableTables] = useState(0);
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
+    
+    // Fetch data
+    const fetchPublicData = async () => {
+      try {
+        const [menuRes, tablesRes] = await Promise.all([
+          getAvailableMenuItems().catch(() => []),
+          getTables().catch(() => [])
+        ]);
+        setMenuItems(menuRes.slice(0, 6)); // Show top 6
+        setAvailableTables(tablesRes.filter(t => t.status === 'AVAILABLE').length);
+      } catch (err) {
+        console.error('Error fetching public data:', err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchPublicData();
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -65,11 +87,17 @@ export default function LandingPage({ onStaffLogin }) {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-              <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 text-white font-semibold shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95">
+              <a href="#menu" className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 text-white font-semibold shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95 text-center">
                 View Our Menu
-              </button>
-              <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold backdrop-blur-sm transition-all">
-                Book a Table
+              </a>
+              <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold backdrop-blur-sm transition-all flex flex-col items-center leading-tight">
+                <span>Book a Table</span>
+                {!loadingData && availableTables > 0 && (
+                  <span className="text-xs text-emerald-400 font-medium">({availableTables} available now)</span>
+                )}
+                {!loadingData && availableTables === 0 && (
+                  <span className="text-xs text-rose-400 font-medium">(Currently full)</span>
+                )}
               </button>
             </div>
           </div>
@@ -84,48 +112,50 @@ export default function LandingPage({ onStaffLogin }) {
             <p className="text-slate-400 max-w-xl mx-auto">Crafted with passion, served with a smile. Explore our carefully curated selection of beverages and treats.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Category 1 */}
-            <div className="group rounded-3xl bg-white/[0.02] border border-white/5 p-8 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Coffee className="text-indigo-400" size={28} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loadingData ? (
+              // Skeletons
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-3xl bg-white/[0.02] border border-white/5 p-6 animate-pulse">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-white/5"></div>
+                    <div className="w-16 h-6 rounded-full bg-white/5"></div>
+                  </div>
+                  <div className="w-3/4 h-5 bg-white/5 rounded mb-3"></div>
+                  <div className="w-full h-4 bg-white/5 rounded mb-2"></div>
+                  <div className="w-5/6 h-4 bg-white/5 rounded"></div>
+                </div>
+              ))
+            ) : menuItems.length > 0 ? (
+              menuItems.map((item) => (
+                <div key={item.id} className="group rounded-3xl bg-white/[0.02] border border-white/5 p-6 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 flex flex-col h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      {item.category === 'Drinks' ? <CupSoda className="text-indigo-400" size={24} /> :
+                       item.category === 'Pastries' ? <CakeSlice className="text-pink-400" size={24} /> :
+                       <Coffee className="text-amber-400" size={24} />}
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-white/5 text-sm font-bold text-white">
+                      ${item.price.toFixed(2)}
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 text-white">{item.name}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">
+                    {item.description}
+                  </p>
+                  <div className="mt-auto">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">
+                      {item.category}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-slate-500">
+                <Coffee size={48} className="mx-auto mb-4 opacity-20" />
+                <p>Menu is currently being updated. Check back soon!</p>
               </div>
-              <h3 className="text-xl font-bold mb-3">Artisan Coffee</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                Ethically sourced beans roasted to perfection. From rich espressos to creamy lattes, our coffee is designed to delight.
-              </p>
-              <a href="#" className="text-indigo-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                Explore Menu <ArrowRight size={16} />
-              </a>
-            </div>
-
-            {/* Category 2 */}
-            <div className="group rounded-3xl bg-white/[0.02] border border-white/5 p-8 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <CakeSlice className="text-emerald-400" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Fresh Pastries</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                Baked fresh daily in-house. Flaky croissants, decadent cakes, and savory treats perfect for any time of day.
-              </p>
-              <a href="#" className="text-emerald-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                Explore Menu <ArrowRight size={16} />
-              </a>
-            </div>
-
-            {/* Category 3 */}
-            <div className="group rounded-3xl bg-white/[0.02] border border-white/5 p-8 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <CupSoda className="text-rose-400" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Signature Drinks</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                Refreshing iced beverages, unique smoothies, and seasonal specials crafted to quench your thirst and spark joy.
-              </p>
-              <a href="#" className="text-rose-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                Explore Menu <ArrowRight size={16} />
-              </a>
-            </div>
+            )}
           </div>
         </div>
       </section>
