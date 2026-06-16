@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Coffee, LayoutDashboard, UtensilsCrossed, Grid3X3,
-  ShoppingCart, Receipt, BarChart3, LogOut, Menu, X, ChevronRight, Bell
+  ShoppingCart, Receipt, BarChart3, LogOut, Menu, X, ChevronRight, Bell, CalendarClock
 } from 'lucide-react';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { id: 'tables', label: 'Tables', icon: Grid3X3, adminOnly: false },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, adminOnly: false },
   { id: 'billing', label: 'Billing', icon: Receipt, adminOnly: false },
+  { id: 'reservations', label: 'Reservations', icon: CalendarClock, adminOnly: false },
   { id: 'reports', label: 'Reports', icon: BarChart3, adminOnly: true },
 ];
 

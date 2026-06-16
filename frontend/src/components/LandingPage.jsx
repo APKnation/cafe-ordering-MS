@@ -1,12 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Coffee, ArrowRight, Star, Clock, MapPin, Phone, Globe, Mail, Heart, ChefHat, CupSoda, CakeSlice } from 'lucide-react';
-import { getAvailableMenuItems, getTables } from '../api';
+import { Coffee, ArrowRight, Star, Clock, MapPin, Phone, Globe, Mail, Heart, ChefHat, CupSoda, CakeSlice, X, Check } from 'lucide-react';
+import { getAvailableMenuItems, getTables, createReservation } from '../api';
 
 export default function LandingPage({ onStaffLogin }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [availableTables, setAvailableTables] = useState(0);
   const [loadingData, setLoadingData] = useState(true);
+  
+  // Reservation Modal State
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [reservationForm, setReservationForm] = useState({ customerName: '', phone: '', guests: 2, reservationTime: '', specialRequests: '' });
+  const [reserving, setReserving] = useState(false);
+  const [reservationSuccess, setReservationSuccess] = useState(false);
+  const [reservationError, setReservationError] = useState('');
+
+  const handleReservationSubmit = async (e) => {
+    e.preventDefault();
+    setReserving(true);
+    setReservationError('');
+    try {
+      await createReservation(reservationForm);
+      setReservationSuccess(true);
+      setTimeout(() => {
+        setShowReservationModal(false);
+        setReservationSuccess(false);
+        setReservationForm({ customerName: '', phone: '', guests: 2, reservationTime: '', specialRequests: '' });
+      }, 3000);
+    } catch (err) {
+      setReservationError(err.message || 'Failed to reserve table. Please try again.');
+    } finally {
+      setReserving(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -172,10 +198,13 @@ export default function LandingPage({ onStaffLogin }) {
                   <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">
                     {item.description}
                   </p>
-                  <div className="mt-auto">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">
+                  <div className="mt-auto pt-6 flex items-center justify-between border-t border-white/5">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md">
                       {item.category}
                     </span>
+                    <a href="#table" className="flex items-center gap-1.5 text-sm font-semibold text-white bg-white/5 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-xl transition-all duration-300">
+                      Order <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </a>
                   </div>
                 </div>
               ))
@@ -213,7 +242,9 @@ export default function LandingPage({ onStaffLogin }) {
                       </div>
                    </div>
 
-                   <button className="px-8 py-4 rounded-full bg-white text-[#0a0f1e] font-bold hover:bg-slate-200 transition-colors shadow-xl">
+                   <button 
+                      onClick={() => setShowReservationModal(true)}
+                      className="px-8 py-4 rounded-full bg-white text-[#0a0f1e] font-bold hover:bg-slate-200 transition-colors shadow-xl">
                       Reserve a Table Now
                    </button>
                 </div>
@@ -363,6 +394,75 @@ export default function LandingPage({ onStaffLogin }) {
           </div>
         </div>
       </footer>
+
+      {/* Reservation Modal */}
+      {showReservationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)' }}>
+          <div className="bg-[#0f172a] border border-white/10 rounded-3xl w-full max-w-lg p-8 shadow-2xl relative">
+            <button onClick={() => setShowReservationModal(false)} className="absolute top-6 right-6 text-slate-400 hover:text-white">
+              <X size={24} />
+            </button>
+            
+            <h3 className="text-2xl font-bold text-white mb-2">Book a Table</h3>
+            <p className="text-slate-400 text-sm mb-6">Fill out the details below and we'll secure your spot.</p>
+            
+            {reservationSuccess ? (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-6 rounded-2xl flex flex-col items-center text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                  <Check size={32} />
+                </div>
+                <h4 className="text-xl font-bold mb-2">Reservation Request Sent!</h4>
+                <p className="text-sm">We'll review your request and you'll be seated right away when you arrive.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleReservationSubmit} className="space-y-4">
+                {reservationError && (
+                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl">
+                    {reservationError}
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" required value={reservationForm.customerName} onChange={e => setReservationForm({...reservationForm, customerName: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500" placeholder="John Doe" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+                    <input type="tel" required value={reservationForm.phone} onChange={e => setReservationForm({...reservationForm, phone: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500" placeholder="+1 234 567 8900" />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Date & Time</label>
+                    <input type="datetime-local" required value={reservationForm.reservationTime} onChange={e => setReservationForm({...reservationForm, reservationTime: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500" style={{ colorScheme: 'dark' }} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Number of Guests</label>
+                    <input type="number" min="1" max="20" required value={reservationForm.guests} onChange={e => setReservationForm({...reservationForm, guests: e.target.value === '' ? '' : parseInt(e.target.value)})}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500" />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Special Requests (Optional)</label>
+                  <textarea value={reservationForm.specialRequests} onChange={e => setReservationForm({...reservationForm, specialRequests: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500 h-24 resize-none" placeholder="Window seat, allergies, high chair needed..."></textarea>
+                </div>
+                
+                <button type="submit" disabled={reserving}
+                  className="w-full py-4 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold transition-colors disabled:opacity-50 mt-2">
+                  {reserving ? 'Reserving...' : 'Confirm Reservation'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

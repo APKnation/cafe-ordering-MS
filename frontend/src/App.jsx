@@ -8,6 +8,7 @@ import TablesView from './components/TablesView';
 import OrdersView from './components/OrdersView';
 import BillingView from './components/BillingView';
 import ReportsView from './components/ReportsView';
+import ReservationsView from './components/ReservationsView';
 import './index.css';
 
 export default function App() {
@@ -56,6 +57,7 @@ export default function App() {
       case 'tables': return <TablesView isAdmin={isAdmin} />;
       case 'orders': return <OrdersView />;
       case 'billing': return <BillingView />;
+      case 'reservations': return <ReservationsView />;
       case 'reports': return isAdmin ? <ReportsView /> : <OrdersView />;
       default: return <DashboardView />;
     }

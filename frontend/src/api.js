@@ -44,6 +44,16 @@ export const updateMenuItem = (id, item) =>
 export const deleteMenuItem = (id) =>
   fetch(`${BASE_URL}/menu/${id}`, { method: 'DELETE', headers: getHeaders() }).then(handleResponse);
 
+// Reservation Endpoints
+export const getReservations = () =>
+  fetch(`${BASE_URL}/reservations`, { headers: getHeaders() }).then(handleResponse);
+
+export const createReservation = (data) =>
+  fetch(`${BASE_URL}/reservations`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(handleResponse);
+
+export const updateReservationStatus = (id, status) =>
+  fetch(`${BASE_URL}/reservations/${id}/status?status=${status}`, { method: 'PATCH', headers: getHeaders() }).then(handleResponse);
+
 // TABLES
 export const getTables = () =>
   fetch(`${BASE_URL}/tables`, { headers: getHeaders() }).then(handleResponse);
