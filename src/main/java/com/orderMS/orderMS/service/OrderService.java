@@ -5,7 +5,10 @@ import com.orderMS.orderMS.dto.OrderRequestDto;
 import com.orderMS.orderMS.model.MenuItem;
 import com.orderMS.orderMS.model.OrderItem;
 import com.orderMS.orderMS.model.OrderRecord;
+import com.orderMS.orderMS.model.DiningTable;
 import com.orderMS.orderMS.model.enums.OrderStatus;
+import com.orderMS.orderMS.model.enums.OrderType;
+import com.orderMS.orderMS.repository.DiningTableRepository;
 import com.orderMS.orderMS.repository.MenuItemRepository;
 import com.orderMS.orderMS.repository.OrderRecordRepository;
 import jakarta.transaction.Transactional;
@@ -23,9 +26,23 @@ public class OrderService {
 
     private final OrderRecordRepository orderRecordRepository;
     private final MenuItemRepository menuItemRepository;
+    private final DiningTableRepository diningTableRepository;
 
     @Transactional
     public OrderRecord placeOrder(OrderRequestDto request) {
+        if (request.getOrderType() == OrderType.DINE_IN) {
+            if (request.getTableNumber() == null) {
+                throw new RuntimeException("Table number is required for Dine-in orders");
+            }
+            DiningTable table = diningTableRepository.findByTableNumber(request.getTableNumber())
+                    .orElseThrow(() -> new RuntimeException("Table " + request.getTableNumber() + " does not exist"));
+            if (table.getIsOccupied()) {
+                throw new RuntimeException("Table " + request.getTableNumber() + " is already occupied");
+            }
+            table.setIsOccupied(true);
+            diningTableRepository.save(table);
+        }
+
         OrderRecord order = OrderRecord.builder()
                 .orderType(request.getOrderType())
                 .tableNumber(request.getTableNumber())
