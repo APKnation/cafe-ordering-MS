@@ -43,4 +43,10 @@ public class MenuController {
             @RequestParam(required = false) Boolean isAvailable) {
         return ResponseEntity.ok(menuService.updateAvailability(id, quantity, isAvailable));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMenuItem(@PathVariable Long id) {
+        menuService.deleteMenuItem(id);
+        return ResponseEntity.noContent().build();
+    }
 }
