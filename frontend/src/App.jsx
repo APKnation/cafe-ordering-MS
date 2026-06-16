@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import Layout from './components/Layout';
 import DashboardView from './components/DashboardView';
@@ -12,6 +13,7 @@ import './index.css';
 export default function App() {
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [showLogin, setShowLogin] = useState(false);
 
   // Restore session on reload
   useEffect(() => {
@@ -35,10 +37,14 @@ export default function App() {
     localStorage.removeItem('role');
     setUser(null);
     setCurrentPage('dashboard');
+    setShowLogin(false);
   };
 
   if (!user) {
-    return <LoginPage onLogin={handleLogin} />;
+    if (showLogin) {
+      return <LoginPage onLogin={handleLogin} onBack={() => setShowLogin(false)} />;
+    }
+    return <LandingPage onStaffLogin={() => setShowLogin(true)} />;
   }
 
   const isAdmin = user.role === 'ROLE_ADMIN';
